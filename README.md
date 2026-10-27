@@ -305,3 +305,4 @@ Nx 23.2.1 orchestrates `nx build web` and `nx build api`; Each module's EF Core 
 - [dotnet-carbon](https://github.com/joshbarros/dotnet-carbon): carbon credit batches and purchases.
 - [dotnet-charging](https://github.com/joshbarros/dotnet-charging): EV charger slot reservations.
 - [dotnet-mint](https://github.com/joshbarros/dotnet-mint): limited-edition drops with a per-collector limit.
+- [dotnet-pledge](https://github.com/joshbarros/dotnet-pledge): matched donations from a sponsor's matching pool.
