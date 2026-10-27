@@ -135,26 +135,29 @@ API=http://127.0.0.1:5220
 login() { curl -s -X POST $API/api/auth/login -H 'content-type: application/json' -d "{\"email\":\"$1\",\"password\":\"$2\"}" | python3 -c 'import sys,json; print(json.load(sys.stdin)["accessToken"])'; }
 ADMIN="Authorization: Bearer $(login admin@promo.local PromoAdmin2026)"
 
-curl -s -X POST $API/api/campaigns -H "$ADMIN" -H 'content-type: application/json' \
-  -d '{"code":"BF-10-OFF","name":"Black Friday 10 Off","channel":"Email","market":"US","usesTotal":10}'
-
 curl -s -X POST $API/api/auth/register -H 'content-type: application/json' \
   -d '{"email":"ana@example.com","password":"Passw0rd-Demo1"}'      # 201; its accessToken goes in $ANA below
 ANA="Authorization: Bearer <accessToken>"
 
-curl -s -X POST $API/api/redemptions -H "$ANA" -H 'content-type: application/json' \
+curl -s -H "$ADMIN" -X POST $API/api/campaigns \
+  -H 'content-type: application/json' \
+  -d '{"code":"BF-10-OFF","name":"Black Friday 10 Off","channel":"Email","market":"US","usesTotal":8,"discountCents":1000}'
+
+curl -s -H "$ANA" -X POST $API/api/redemptions \
+  -H 'content-type: application/json' \
   -d '{"campaignCode":"BF-10-OFF","reference":"CUS-1001","uses":3}'
-# 202, status Requested. Use the returned id:
+# 202, status Requested, valueCents 3000. Use the returned id:
 
-curl -s -H "$ANA" $API/api/redemptions/<id>             # Redeemed after a few seconds, with a coupon number
+curl -s -H "$ANA" $API/api/redemptions/<id>           # Redeemed after a few seconds, with a coupon number
 curl -s -H "$ANA" $API/api/coupons/<id>
-curl -s -H "$ANA" $API/api/campaigns/BF-10-OFF     # usesLeft 5
-curl -s -H "$ADMIN" $API/api/redemptions/<id>/events    # the Kafka log; staff only (a customer gets 403)
+curl -s -H "$ANA" $API/api/campaigns/BF-10-OFF        # usesLeft 5
+curl -s -H "$ADMIN" $API/api/redemptions/<id>/events    # the Kafka log for this redemption
 
-curl -s -X POST -H "$ANA" $API/api/redemptions/<id>/revocation   # uses go back; the coupon stays
+curl -s -H "$ANA" -X POST $API/api/redemptions/<id>/revocation \
+  -H 'content-type: application/json'                        # uses go back to the campaign; the coupon stays
 ```
 
-A redemption is validated at the door: reference required (at most 40 characters), uses from 1 to 3 uses. The poison match is a case-sensitive substring: `CUS-POISON-7` and any longer token containing `POISON` match.
+A redemption is validated at the door: customer reference required (at most 40 characters), 1 to 3 uses. The poison match is a case-sensitive substring: `CUS-POISON-7` and any longer token containing `POISON` match.
 
 ## Develop with Nx
 
