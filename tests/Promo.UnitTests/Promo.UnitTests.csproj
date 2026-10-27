@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="coverlet.collector" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" />
+    <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" />
+    <ProjectReference Include="../../libs/shared/Promo.Shared.csproj" />
+    <ProjectReference Include="../../libs/identity/Promo.Identity.csproj" />
+    <ProjectReference Include="../../libs/redemptions/Promo.Redemptions.csproj" />
+    <ProjectReference Include="../../libs/campaigns/Promo.Campaigns.csproj" />
+    <ProjectReference Include="../../libs/coupons/Promo.Coupons.csproj" />
+  </ItemGroup>
+</Project>

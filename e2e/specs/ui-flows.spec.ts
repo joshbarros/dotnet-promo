@@ -1,9 +1,10 @@
 import { test, expect, Page } from '@playwright/test';
+import { ADMIN, signIn } from './support';
 
 const run = () => Date.now().toString(36).toUpperCase() + Math.floor(Math.random() * 1000);
 
 async function openAccount(page: Page, code: string, capamarket: number, shown: string) {
-  await page.goto('/');
+  await signIn(page, ADMIN);
   await page.getByLabel('Campaign code').fill(code);
   await page.getByLabel('Redemption cap').fill(String(capamarket));
   await page.getByRole('button', { name: 'Add campaign' }).click();
@@ -26,7 +27,7 @@ test('the API refuses bad input and the page says why', async ({ page }) => {
   await submit(page, `CUS-${id}`, 4);
   await expect(page.getByRole('alert')).toContainText('at most 3 uses');
 
-  await submit(page, '   ', 1);
+  await submit(page, ' ', 1);
   await expect(page.getByRole('alert')).toContainText(/reference is required/i);
 
   await submit(page, `CUS-${id}`, 1);

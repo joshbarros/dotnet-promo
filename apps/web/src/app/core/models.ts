@@ -15,6 +15,7 @@ export type RedemptionStatus = 'Requested' | 'Held' | 'Redeemed' | 'Revoked' | '
 export interface Redemption {
   id: string;
   campaignCode: string;
+  ownerId: string;
   reference: string;
   uses: number;
   valueCents: number;
@@ -31,4 +32,16 @@ export interface LogEntry {
   type: string;
   module: string;
   occurredAt: string;
+}
+
+export interface UserInfo {
+  id: string;
+  email: string;
+  roles: string[];
+}
+
+export interface AuthResponse {
+  accessToken: string;
+  expiresAt: string;
+  user: UserInfo;
 }
