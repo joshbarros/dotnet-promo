@@ -63,7 +63,7 @@ public class RedemptionService(RedemptionsDbContext db, ICampaignCatalog campaig
         return redemption;
     }
 
-    public async Task<List<Redemption>> ListAsync(string? campaignCode, CancellationToken ct)
+    public async Task<(List<Redemption> Items, int Total)> ListAsync(string? campaignCode, int page, int pageSize, CancellationToken ct)
     {
         var query = db.Redemptions.AsNoTracking();
         if (!user.IsStaff)
@@ -73,7 +73,9 @@ public class RedemptionService(RedemptionsDbContext db, ICampaignCatalog campaig
         }
         if (!string.IsNullOrWhiteSpace(campaignCode))
             query = query.Where(b => b.CampaignCode == campaignCode);
-        return await query.OrderByDescending(b => b.CreatedAt).Take(100).ToListAsync(ct);
+        var total = await query.CountAsync(ct);
+        var items = await query.OrderByDescending(b => b.CreatedAt).Skip((page - 1) * pageSize).Take(pageSize).ToListAsync(ct);
+        return (items, total);
     }
 
     /// <summary>Moves Held or Redeemed to Revoked and asks Campaigns to give the uses back. The coupon is not touched.</summary>

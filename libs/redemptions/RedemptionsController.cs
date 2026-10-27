@@ -19,10 +19,14 @@ public class RedemptionsController(RedemptionService service, KafkaLog kafka) : 
         return Accepted($"/api/redemptions/{redemption.Id}", RedemptionDto.From(redemption));
     }
 
-    /// <summary>Your redemptions. Staff see everyone's.</summary>
+    /// <summary>Your redemptions, newest first, a page at a time (default 100, at most 100). Staff see everyone's. The total is in X-Total-Count.</summary>
     [HttpGet]
-    public async Task<IEnumerable<RedemptionDto>> List([FromQuery] string? campaignCode, CancellationToken ct) =>
-        (await service.ListAsync(campaignCode, ct)).Select(RedemptionDto.From);
+    public async Task<IEnumerable<RedemptionDto>> List([FromQuery] string? campaignCode, [FromQuery] int page = 1, [FromQuery] int pageSize = 100, CancellationToken ct = default)
+    {
+        var (items, total) = await service.ListAsync(campaignCode, Math.Max(page, 1), Math.Clamp(pageSize, 1, 100), ct);
+        Response.Headers["X-Total-Count"] = total.ToString();
+        return items.Select(RedemptionDto.From);
+    }
 
     [HttpGet("{id:guid}")]
     public async Task<RedemptionDto> Get(Guid id, CancellationToken ct) => RedemptionDto.From(await service.GetAsync(id, ct));
